@@ -35,7 +35,15 @@ RUN set -ex && \
     rm -rf /var/cache/apk/*
 COPY --from=tone /usr/local/bin/tone /usr/local/bin/
 COPY --from=integrate /app /app
-RUN set -ex && cd /app && npm ci --only=production
+RUN set -ex && \
+    cd /app && \
+    apk add --no-cache --update \
+        make \
+        python3 \
+        g++ && \
+    npm ci --only=production && \
+    apk del make python3 g++ && \
+    rm -rf /var/cache/apk/*
 COPY --chmod=755 entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]
 CMD ["node", "index.js"]
