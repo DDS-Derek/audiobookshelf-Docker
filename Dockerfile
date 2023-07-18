@@ -44,6 +44,7 @@ RUN set -ex && \
     npm ci --only=production && \
     apk del make python3 g++ && \
     rm -rf /var/cache/apk/*
+ENV NODE_OPTIONS=--max-old-space-size=8192
 COPY --chmod=755 entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]
 CMD ["node", "index.js"]
