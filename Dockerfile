@@ -37,14 +37,13 @@ COPY --from=tone /usr/local/bin/tone /usr/local/bin/
 COPY --from=integrate /app /app
 RUN set -ex && \
     cd /app && \
-    apk add --no-cache --update \
+    apk add --no-cache --update --virtual .build-deps \
         make \
         python3 \
         g++ && \
     npm ci --only=production && \
-    apk del make python3 g++ && \
+    apk del --purge .build-deps \
     rm -rf /var/cache/apk/*
-ENV NODE_OPTIONS=--max-old-space-size=4096
 COPY --chmod=755 entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]
 CMD ["node", "index.js"]
