@@ -1,4 +1,4 @@
-name: Build
+name: Test
 
 on:
   workflow_dispatch:
@@ -26,8 +26,7 @@ jobs:
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/audiobookshelf
           tags: |
-            type=raw,value=${{ env.AUDIOBOOKSHELF_VERSION }}
-            type=raw,value=latest
+            type=raw,value=test
 
       - 
         name: Set Up QEMU
@@ -52,20 +51,8 @@ jobs:
           file: Dockerfile
           platforms: |
             linux/amd64
-            linux/arm64
-            linux/arm/v7
           build-args: |
             AUDIOBOOKSHELF_VERSION=${{ env.AUDIOBOOKSHELF_VERSION }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      - 
-        name: Docker Hub Description
-        uses: peter-evans/dockerhub-description@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: ${{ secrets.DOCKER_USERNAME }}/audiobookshelf
-          short-description: A better audiobookshelf image
-          readme-filepath: ./README.md
