@@ -2,11 +2,8 @@ name: Build
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-    paths:
-      - version.json
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   build:
@@ -20,12 +17,29 @@ jobs:
       - 
         name: Get version
         run: |
-          AUDIOBOOKSHELF_VERSION=$(jq -r '.version' version.json)
-          echo "${AUDIOBOOKSHELF_VERSION}"
-          echo "AUDIOBOOKSHELF_VERSION=${AUDIOBOOKSHELF_VERSION}" >> $GITHUB_ENV
+          OLD_AUDIOBOOKSHELF_VERSION=$(jq -r '.version' version.json)
+          AUDIOBOOKSHELF_VERSION=$(curl -s "https://api.github.com/repos/advplyr/audiobookshelf/releases/latest" | jq -r .tag_name)
+          if [[ ${AUDIOBOOKSHELF_VERSION} =~ ^v[0-9]+ ]]; then
+            if [[ ${AUDIOBOOKSHELF_VERSION} != ${OLD_AUDIOBOOKSHELF_VERSION} ]]; then
+              echo "${AUDIOBOOKSHELF_VERSION}"
+              echo "AUDIOBOOKSHELF_VERSION=${AUDIOBOOKSHELF_VERSION}" >> $GITHUB_ENV
+              echo -e "{\n    \""version\"": \""${AUDIOBOOKSHELF_VERSION}\""\n}" > version.json
+              echo "build_status=success" >> $GITHUB_ENV
+            fi
+          fi
+
+      -
+        if: env.build_status == 'success'
+        uses: stefanzweifel/git-auto-commit-action@e8f94e4dd298db5a6a2aa2d42fe0bcef6f2c9660
+        with:
+          commit_message: "bump: audiobookshelf ${{ env.AUDIOBOOKSHELF_VERSION }}"
+          branch: master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - 
         name: Docker meta
+        if: env.build_status == 'success'
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -36,14 +50,17 @@ jobs:
 
       - 
         name: Set Up QEMU
+        if: env.build_status == 'success'
         uses: docker/setup-qemu-action@v3
 
       - 
         name: Set Up Buildx
+        if: env.build_status == 'success'
         uses: docker/setup-buildx-action@v3
         
       - 
         name: Login DockerHub
+        if: env.build_status == 'success'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -51,6 +68,7 @@ jobs:
 
       - 
         name: Build
+        if: env.build_status == 'success'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -67,6 +85,7 @@ jobs:
 
       - 
         name: Docker Hub Description
+        if: env.build_status == 'success'
         uses: peter-evans/dockerhub-description@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
