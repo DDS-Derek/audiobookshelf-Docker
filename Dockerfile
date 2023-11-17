@@ -1,18 +1,18 @@
 # syntax=docker/dockerfile:1.6
 
-FROM node:16-alpine AS prepare
+FROM node:21-alpine AS prepare
 ARG AUDIOBOOKSHELF_VERSION
 RUN set -ex && apk add git jq curl
 RUN set -ex && \
     git clone -b ${AUDIOBOOKSHELF_VERSION} https://github.com/advplyr/audiobookshelf.git /prepare
 
-FROM node:16-alpine AS build
+FROM node:21-alpine AS build
 WORKDIR /client
 COPY --from=prepare /prepare/client /client
 RUN set -ex && npm ci && npm cache clean --force
 RUN set -ex && npm run generate
 
-FROM node:16-alpine AS integrate
+FROM node:21-alpine AS integrate
 COPY --from=build /client/dist /app/client/dist
 COPY --from=prepare /prepare/index.js /app
 COPY --from=prepare /prepare/package* /app
@@ -20,7 +20,7 @@ COPY --from=prepare /prepare/server /app/server
 
 FROM sandreas/tone:v0.1.5 AS tone
 
-FROM node:16-alpine
+FROM node:21-alpine
 ENV NODE_ENV=production
 RUN set -ex && \
     apk add --no-cache --update \
