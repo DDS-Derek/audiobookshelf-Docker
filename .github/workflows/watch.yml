@@ -21,7 +21,7 @@ jobs:
           echo "${AUDIOBOOKSHELF_VERSION}"
           echo "AUDIOBOOKSHELF_VERSION=${AUDIOBOOKSHELF_VERSION}" >> $GITHUB_ENV
           if [[ ${AUDIOBOOKSHELF_VERSION} =~ ^v[0-9]+ ]]; then
-            echo -e "{\n    \""version\"": \""${{ env.AUDIOBOOKSHELF_VERSION }}\""\n}" > version.json
+            echo -e "{\n    \""version\"": \""${AUDIOBOOKSHELF_VERSION}\""\n}" > version.json
           fi
 
       -
