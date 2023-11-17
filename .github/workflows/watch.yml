@@ -1,0 +1,33 @@
+name: Watch
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@master
+
+      - 
+        name: Get version
+        run: |
+          AUDIOBOOKSHELF_VERSION=$(curl -s "https://api.github.com/repos/advplyr/audiobookshelf/releases/latest" | jq -r .tag_name)
+          echo "${AUDIOBOOKSHELF_VERSION}"
+          echo "AUDIOBOOKSHELF_VERSION=${AUDIOBOOKSHELF_VERSION}" >> $GITHUB_ENV
+          if [[ ${AUDIOBOOKSHELF_VERSION} =~ ^v[0-9]+ ]]; then
+            echo -e "{\n    \""version\"": \""${{ env.AUDIOBOOKSHELF_VERSION }}\""\n}" > version.json
+          fi
+
+      -
+        uses: stefanzweifel/git-auto-commit-action@e8f94e4dd298db5a6a2aa2d42fe0bcef6f2c9660
+        with:
+          commit_message: "bump: audiobookshelf ${{ env.AUDIOBOOKSHELF_VERSION }}"
+          branch: master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

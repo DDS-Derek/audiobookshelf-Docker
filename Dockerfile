@@ -1,8 +1,9 @@
+# syntax=docker/dockerfile:1.6
+
 FROM node:16-alpine AS prepare
 ARG AUDIOBOOKSHELF_VERSION
 RUN set -ex && apk add git jq curl
 RUN set -ex && \
-    AUDIOBOOKSHELF_VERSION=${AUDIOBOOKSHELF_VERSION:-$(curl -s "https://api.github.com/repos/advplyr/audiobookshelf/releases/latest" | jq -r .tag_name)} && \
     git clone -b ${AUDIOBOOKSHELF_VERSION} https://github.com/advplyr/audiobookshelf.git /prepare
 
 FROM node:16-alpine AS build

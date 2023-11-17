@@ -15,7 +15,7 @@ jobs:
       - 
         name: Get version
         run: |
-          AUDIOBOOKSHELF_VERSION=$(curl -s "https://api.github.com/repos/advplyr/audiobookshelf/releases/latest" | jq -r .tag_name)
+          AUDIOBOOKSHELF_VERSION=$(jq -r '.version' version.json)
           echo "${AUDIOBOOKSHELF_VERSION}"
           echo "AUDIOBOOKSHELF_VERSION=${AUDIOBOOKSHELF_VERSION}" >> $GITHUB_ENV
 
