@@ -18,7 +18,7 @@ COPY --from=prepare /prepare/index.js /app
 COPY --from=prepare /prepare/package* /app
 COPY --from=prepare /prepare/server /app/server
 
-FROM sandreas/tone:v0.1.5 AS tone
+FROM sandreas/tone:v0.1.7 AS tone
 
 FROM node:20-alpine
 ENV NODE_ENV=production
