@@ -18,8 +18,6 @@ COPY --from=prepare /prepare/index.js /app
 COPY --from=prepare /prepare/package* /app
 COPY --from=prepare /prepare/server /app/server
 
-FROM sandreas/tone:v0.1.5 AS tone
-
 FROM node:20-alpine
 ENV NODE_ENV=production
 RUN set -ex && \
@@ -34,7 +32,6 @@ RUN set -ex && \
         dumb-init && \
     usermod --shell /bin/bash node && \
     rm -rf /var/cache/apk/*
-COPY --from=tone /usr/local/bin/tone /usr/local/bin/
 COPY --from=integrate /app /app
 RUN set -ex && \
     cd /app && \
