@@ -29,6 +29,7 @@ RUN set -ex && \
         jq \
         shadow \
         su-exec \
+        gcompat \
         dumb-init && \
     usermod --shell /bin/bash node && \
     rm -rf /var/cache/apk/*
