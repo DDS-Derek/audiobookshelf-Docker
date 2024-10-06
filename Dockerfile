@@ -20,6 +20,9 @@ COPY --from=prepare /prepare/server /app/server
 
 FROM node:20-alpine
 ENV NODE_ENV=production
+ENV NUSQLITE3_DIR="/usr/local/lib/nusqlite3"
+ENV NUSQLITE3_PATH="${NUSQLITE3_DIR}/libnusqlite3.so"
+ARG TARGETPLATFORM
 RUN set -ex && \
     apk add --no-cache --update \
         curl \
@@ -30,9 +33,18 @@ RUN set -ex && \
         shadow \
         su-exec \
         gcompat \
+        unzip \
         dumb-init && \
     usermod --shell /bin/bash node && \
-    rm -rf /var/cache/apk/*
+    case "$TARGETPLATFORM" in \
+    "linux/amd64") \
+    curl -L -o /tmp/library.zip "https://github.com/mikiher/nunicode-sqlite/releases/download/v1.1/libnusqlite3-linux-x64.zip" ;; \
+    "linux/arm64") \
+    curl -L -o /tmp/library.zip "https://github.com/mikiher/nunicode-sqlite/releases/download/v1.1/libnusqlite3-linux-arm64.zip" ;; \
+    *) echo "Unsupported platform: $TARGETPLATFORM" && exit 1 ;; \
+    esac && \
+    unzip /tmp/library.zip -d $NUSQLITE3_DIR && \
+    rm -rf /tmp/library.zip /var/cache/apk/*
 COPY --from=integrate /app /app
 RUN set -ex && \
     cd /app && \
