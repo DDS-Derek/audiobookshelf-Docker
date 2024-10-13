@@ -30,7 +30,7 @@ jobs:
 
       -
         if: env.build_status == 'success'
-        uses: stefanzweifel/git-auto-commit-action@573710f3d0c14b43784ede49b68d484ca7f555dc
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "bump: audiobookshelf ${{ env.AUDIOBOOKSHELF_VERSION }}"
           branch: master
