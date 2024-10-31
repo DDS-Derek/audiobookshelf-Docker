@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.10
+# syntax=docker/dockerfile:1.11
 
 FROM node:20-alpine AS prepare
 ARG AUDIOBOOKSHELF_VERSION
