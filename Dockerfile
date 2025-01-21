@@ -54,6 +54,10 @@ RUN set -ex && \
     npm ci --only=production && \
     apk del --purge .build-deps \
     rm -rf /var/cache/apk/*
+ENV PORT=80 \
+    CONFIG_PATH="/config" \
+    METADATA_PATH="/metadata" \
+    SOURCE="docker"
 COPY --chmod=755 entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]
 CMD ["node", "index.js"]
