@@ -2,19 +2,19 @@
 ARG NUSQLITE3_DIR="/usr/local/lib/nusqlite3"
 ARG NUSQLITE3_PATH="${NUSQLITE3_DIR}/libnusqlite3.so"
 
-FROM node:20-alpine AS prepare
+FROM node:22-alpine AS prepare
 ARG AUDIOBOOKSHELF_VERSION
 RUN set -ex && apk add git jq curl
 RUN set -ex && \
     git clone -b ${AUDIOBOOKSHELF_VERSION} https://github.com/advplyr/audiobookshelf.git /prepare
 
-FROM node:20-alpine AS build-client
+FROM node:22-alpine AS build-client
 WORKDIR /client
 COPY --from=prepare /prepare/client /client
 RUN set -ex && npm ci && npm cache clean --force
 RUN set -ex && npm run generate
 
-FROM node:20-alpine AS build-server
+FROM node:22-alpine AS build-server
 
 ARG NUSQLITE3_DIR
 ARG TARGETPLATFORM
@@ -45,7 +45,7 @@ RUN case "$TARGETPLATFORM" in \
 
 RUN npm ci --only=production
 
-FROM node:20-alpine
+FROM node:22-alpine
 
 ARG NUSQLITE3_DIR
 ARG NUSQLITE3_PATH
